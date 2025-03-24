@@ -1,4 +1,5 @@
-/*===========================
+/*========================== 
+  
   OrbList (ALL WORK GOES HERE)
 
   Class to represent a Linked List of OrbNodes.
@@ -34,7 +35,7 @@ class OrbList {
     You do not need to modify this method.
     =========================*/
   OrbList() {
-    front = null;
+    front = null;// Empties the OrbNode
   }//constructor
 
   /*===========================
@@ -42,9 +43,12 @@ class OrbList {
 
     Insert o to the beginning of the list.
     =========================*/
-  void addFront(OrbNode o) {
-
-  }//addFront
+void addFront(OrbNode o) {
+  if (o != null) {
+    o.next = front; // The new node becomes front
+    front = o;      // front becomes that node
+  }
+}//addFront
 
 
   /*===========================
@@ -57,9 +61,25 @@ class OrbList {
     have the same y coordinate and be spaced
     SPRING_LEGNTH apart horizontally.
     =========================*/
-  void populate(int n, boolean ordered) {
+void populate(int n, boolean ordered) {
+  
+  front = null;
 
-  }//populate
+  for (int i = 0; i < n; i++) {//uses a for loop to create new nodes based on center
+    OrbNode newNode;
+
+    if (ordered) {//see if it is order. If it is true then it makes y value same and x values different
+      float x = (width / 2) - (n * SPRING_LENGTH / 2) + i * SPRING_LENGTH; // Different X CORD
+      float y = height / 2; // Same Y CORD
+      newNode = new OrbNode(x, y, random(MIN_SIZE, MAX_SIZE), random(MIN_MASS, MAX_MASS));
+    } else {//Otherwise
+      
+      newNode = new OrbNode(); //Uses the default costrcutor to make random CORD
+    }
+
+    addFront(newNode); // Add the new node to the front
+  }
+}//populate
 
   /*===========================
     display(int springLength)
@@ -67,9 +87,14 @@ class OrbList {
     Display all the nodes in the list using
     the display method defined in the OrbNode class.
     =========================*/
-  void display() {
 
-  }//display
+void display() {
+  OrbNode current = front; // Diclares the front the current OrbNode
+  while (current != null) { // Goes through the nodes
+    current.display(); // Call the display method for the current node
+    current = current.next; // Move to the next node
+  }
+}//display
 
   /*===========================
     applySprings(int springLength, float springK)
@@ -78,7 +103,11 @@ class OrbList {
     element in the list.
     =========================*/
   void applySprings(int springLength, float springK) {
-
+OrbNode current = front; // Start from the front of the list
+  while (current != null) { // Goes through the list
+    current.applySprings(springLength, springK); //same as display but calls applysprings with appropiate perameters
+    current = current.next; //same as display
+  }
   }//applySprings
 
   /*===========================
@@ -87,18 +116,30 @@ class OrbList {
     Use the getGravity and applyForce methods
     to apply gravity crrectly.
     =========================*/
-  void applyGravity(Orb other, float gConstant) {
-
-  }//applySprings
+ void applyGravity(Orb other, float gConstant) {
+  OrbNode current = front; // Start from the front of the list
+  while (current != null) { // Traverse the list until the end
+    // Calculate the gravitational force between the current orb and the central object
+    PVector gravityForce = current.getGravity(other, gConstant);
+    //use a method to get the gravity force
+    current.applyForce(gravityForce);//Apply the gravity force using Apply force
+    current = current.next; // Move to the next node
+  }
+}//applySprings
 
   /*===========================
     run(boolean bounce)
 
     Call run on each node in the list.
     =========================*/
-  void run(boolean boucne) {
-
-  }//applySprings
+void run(boolean bounce) {
+  OrbNode current = front; // Start from the front of the list
+  while (current != null) { // Gpes through the list
+   // println("Moving node at: (" + current.center.x + ", " + current.center.y + ")");
+    current.move(bounce); // Call the move method 
+    current = current.next; // Move to the next node
+  }
+}//applySprings
 
   /*===========================
     removeFront()
@@ -107,9 +148,11 @@ class OrbList {
     after this method is run, the former second element
     should now be the first (and so on).
     =========================*/
-  void removeFront() {
-
-  }//removeFront
+void removeFront() {
+  if (front != null) { // Make sures that the list is not empty
+    front = front.next; // Makes front the second node
+  }
+}//removeFront
 
 
   /*===========================
@@ -122,10 +165,16 @@ class OrbList {
     See isSlected(float x, float y) in
     the Orb class (line 115).
     =========================*/
-  OrbNode getSelected(int x, int y) {
-
-    return null;
-  }//getSelected
+OrbNode getSelected(int x, int y) {
+  OrbNode current = front; // Start from the front of the list
+  while (current != null) { // Runs through the list
+    if (current.isSelected(x, y)) { // Makes sure current node is selected
+      return current; // Return the node if and only if it is selected
+    }
+    current = current.next; // Move to the next node
+  }
+  return null; // Return null if no node is selected
+}//getSelected
 
   /*===========================
     removeNode(OrbNode o)
@@ -135,6 +184,25 @@ class OrbList {
     You cannot assume anything about the
     position of o in the list.
     =========================*/
-  void removeNode(OrbNode o) {
+void removeNode(OrbNode o) {
+  if (o == null || front == null) {
+    return; // If the node is null or the list is empty, do nothing
   }
+
+  if (front == o) {
+    // If the node to remove is the front node
+    front = front.next; // Update front to the next node
+    return;
+  }
+
+  // Find the node before o
+  OrbNode current = front;
+  while (current != null && current.next != o) {
+    current = current.next;
+  }
+
+  if (current != null) {
+    current.next = o.next;
+  }
+}
 }//OrbList
